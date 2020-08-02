@@ -46,7 +46,9 @@ func initConfig() {
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-			log.Fatalf("unable to read config: %v", err)
+			log.Fatalf("unable to read config: %s", err)
+		} else if cfgFile != "" {
+			log.Fatalf("unable to read config '%s': %s", cfgFile, err)
 		}
 	}
 }
