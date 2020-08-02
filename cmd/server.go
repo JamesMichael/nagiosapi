@@ -103,6 +103,7 @@ func mustBuildAPIServer(l *zap.Logger, h *server.StatusHandler) *server.Server {
 	addr := viper.GetString("api.addr")
 	s, err := server.NewServer(
 		server.WithAddr(addr),
+		server.WithLog(l),
 		server.WithStatusHandler(h),
 	)
 	if err != nil {
