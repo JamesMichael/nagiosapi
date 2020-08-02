@@ -3,7 +3,7 @@
 
 Name:         nagios-api
 Version:      0.1.0
-Release:      2%{?dist}
+Release:      3%{?dist}
 Summary:      Nagios API Server
 URL:          https://github.com/JamesMichael/nagiosapi
 Source0:      https://github.com/JamesMichael/nagiosapi/archive/v%{version}.tar.gz
@@ -26,11 +26,11 @@ Summary: Nagios API Server
 %{summary}
 
 %prep
-%setup
+%setup -qn nagiosapi-%{version}
 
 %build
 go mod vendor
-go build -mod vendor -o nagios-api main.go
+go build -mod vendor -o nagios-api-server main.go
 
 %install
 
@@ -40,7 +40,7 @@ install -m 0755 -d %{buildroot}%{_sysconfdir}
 install -m 0755 -d %{buildroot}%{_sysconfdir}
 install -m 0755 -d %{buildroot}%{_unitdir}
 
-cp -a nagios-api %{buildroot}%{_libexecdir}
+cp -a nagios-api-server %{buildroot}%{_libexecdir}
 cp -a etc/* %{buildroot}%{_sysconfdir}
 cp -a usr/lib/systemd/system/* %{buildroot}%{_unitdir}
 
@@ -51,7 +51,7 @@ cp -a usr/lib/systemd/system/* %{buildroot}%{_unitdir}
 %license LICENSE
 %doc README.md
 
-%config(noreplace) %{_sysconfdir}/nagiosapi/server.yaml
+%config(noreplace) %{_sysconfdir}/nagios-api/nagios-api.yaml
 %{_libexecdir}/nagios-api-server
 %{_unitdir}/nagios-api-server.service
 
@@ -65,5 +65,5 @@ cp -a usr/lib/systemd/system/* %{buildroot}%{_unitdir}
 %systemd_postun_with_restart nagios-api-server.service
 
 %changelog
-* Sun Aug 2 2020 James Michael <jamesamichael@gmail.com>
+* Sun Aug 2 2020 James Michael <jamesamichael@gmail.com> - 0.1.0-3
 - Initial package
