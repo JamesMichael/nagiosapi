@@ -90,7 +90,8 @@ func (s *Server) ServeHTTP() {
 		zap.String("addr", s.addr),
 	)
 	if err := http.ListenAndServe(s.addr, router); err != nil {
-		s.log.Fatal("failed ")
+		s.log.Fatal("unexpected server failure",
+			zap.Error(err))
 	}
 }
 
