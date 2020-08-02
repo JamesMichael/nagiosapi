@@ -30,3 +30,5 @@ cors:
 
 nagios:
   status_file: status.dat
+  reload_status_file: true
+  reload_interval: 60

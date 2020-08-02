@@ -57,6 +57,14 @@ func NewRepository(filename string, opts ...RepositoryOpt) (*Repository, error) 
 		return nil, err
 	}
 
+	if r.refreshInterval != 0 {
+		go func() {
+			for range time.Tick(r.refreshInterval) {
+				r.load()
+			}
+		}()
+	}
+
 	return r, nil
 }
 
@@ -145,13 +153,6 @@ func WithLog(log *zap.Logger) RepositoryOpt {
 func WithRefresh(interval time.Duration) RepositoryOpt {
 	return func(r *Repository) error {
 		r.refreshInterval = interval
-
-		go func() {
-			for range time.Tick(r.refreshInterval) {
-				r.load()
-			}
-		}()
-
 		return nil
 	}
 }

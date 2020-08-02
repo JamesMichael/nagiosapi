@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/jamesmichael/nagiosapi/nagios/statusdata"
 	"github.com/jamesmichael/nagiosapi/server"
@@ -68,9 +69,15 @@ func mustBuildLog() *zap.Logger {
 
 func mustBuildStatusRepo(l *zap.Logger) *statusdata.Repository {
 	statusFile := viper.GetString("nagios.status_file")
-	r, err := statusdata.NewRepository(statusFile,
+
+	opts := []statusdata.RepositoryOpt{
 		statusdata.WithLog(l),
-	)
+	}
+
+	if viper.GetBool("nagios.reload_status_file") {
+		opts = append(opts, statusdata.WithRefresh(time.Duration(viper.GetInt("nagios.reload_interval"))*time.Second))
+	}
+	r, err := statusdata.NewRepository(statusFile, opts...)
 	if err != nil {
 		l.Fatal("unable to read nagios status file",
 			zap.String("filename", statusFile),
