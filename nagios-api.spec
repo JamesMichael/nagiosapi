@@ -3,7 +3,7 @@
 
 Name:         nagios-api
 Version:      0.1.0
-Release:      1%{?dist}
+Release:      2%{?dist}
 Summary:      Nagios API Server
 URL:          https://github.com/JamesMichael/nagiosapi
 Source0:      https://github.com/JamesMichael/nagiosapi/archive/v%{version}.tar.gz
@@ -51,7 +51,7 @@ cp -a usr/lib/systemd/system/* %{buildroot}%{_unitdir}
 %license LICENSE
 %doc README.md
 
-%{_datadir}/nagiosapi/server.yaml
+%config(noreplace) %{_sysconfdir}/nagiosapi/server.yaml
 %{_libexecdir}/nagios-api-server
 %{_unitdir}/nagios-api-server.service
 
