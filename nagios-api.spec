@@ -2,8 +2,8 @@
 %define debug_package %{nil}
 
 Name:         nagios-api
-Version:      0.1.0
-Release:      3%{?dist}
+Version:      0.1.1
+Release:      1%{?dist}
 Summary:      Nagios API Server
 URL:          https://github.com/JamesMichael/nagiosapi
 Source0:      https://github.com/JamesMichael/nagiosapi/archive/v%{version}.tar.gz
@@ -65,5 +65,8 @@ cp -a usr/lib/systemd/system/* %{buildroot}%{_unitdir}
 %systemd_postun_with_restart nagios-api-server.service
 
 %changelog
+* Sun Aug 2 2020 James Michael <jamesamichael@gmail.com> - 0.1.1-1
+- Fix miscellaneous bugs
+
 * Sun Aug 2 2020 James Michael <jamesamichael@gmail.com> - 0.1.0-3
 - Initial package
