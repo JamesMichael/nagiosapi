@@ -25,8 +25,8 @@ func init() {
 
 	var apiAddr string
 	serverCmd.Flags().StringVar(&apiAddr, "api.addr", "", "api address")
-	viper.SetDefault("api_addr", ":3000")
-	viper.BindPFlag("api_addr", serverCmd.Flags().Lookup("api.addr"))
+	viper.SetDefault("api.addr", ":3000")
+	viper.BindPFlag("api.addr", serverCmd.Flags().Lookup("api.addr"))
 
 	var nagiosStatusFile string
 	serverCmd.Flags().StringVar(&nagiosStatusFile, "nagios.status-file", "", "path to status.dat")
