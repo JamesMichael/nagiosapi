@@ -1,0 +1,56 @@
+package xdata
+
+// HostStatus represents a 'hoststatus' entry in the Nagios state.dat file.
+type HostStatus struct {
+	AcknowledgementType        AcknowledgementType
+	ActiveChecksEnabled        bool
+	CheckCommand               string
+	CheckExecutionTime         float32
+	CheckInterval              float32
+	CheckLatency               float32
+	CheckOptions               int
+	CheckPeriod                string
+	CheckType                  CheckType
+	CurrentAttempt             int
+	CurrentEventID             int
+	CurrentNotificationID      int
+	CurrentNotificationNumber  int
+	CurrentProblemID           int
+	CurrentState               HostState
+	EventHandler               string
+	EventHandlerEnabled        bool
+	FlapDetectionEnabled       bool
+	HasBeenChecked             bool
+	HostName                   string
+	IsFlapping                 bool
+	LastCheck                  int
+	LastEventID                int
+	LastHardState              HostState
+	LastHardStateChange        int
+	LastNotification           int
+	LastProblemID              int
+	LastStateChange            int
+	LastTimeDown               int
+	LastTimeUnreachable        int
+	LastTimeUp                 int
+	LastUpdate                 int
+	LongPluginOutput           string
+	MaxAttempts                int
+	ModifiedAttributes         ModifiedAttribute
+	NextCheck                  int
+	NextNotification           int
+	NoMoreNotifications        bool
+	NotificationPeriod         string
+	NotificationsEnabled       bool
+	Obsess                     bool
+	PassiveChecksEnabled       bool
+	PercentStateChange         float32
+	PerformanceData            string
+	PluginOutput               string
+	ProblemHasBeenAcknowledged bool
+	ProcessPerformanceData     bool
+	RetryInterval              float32
+	ScheduledDowntimeDepth     int
+	ShouldBeScheduled          bool
+	StateType                  StateType
+}

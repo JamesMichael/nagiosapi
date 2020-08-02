@@ -1,0 +1,32 @@
+---
+api:
+  addr: :3000
+
+app:
+  production: false
+
+basic_auth:
+  enabled: false
+  realm: nagios-api
+  users:
+    username: password
+
+cors:
+  enabled: false
+
+  allowed_origins:
+    - '*'
+  allowed_methods:
+    - GET
+    - POST
+    - OPTIONS
+  allowed_headers:
+    - Accept
+    - Authorization
+    - Content-Type
+  exposed_headers: []
+  allow_credentials: false
+  max_age: 300
+
+nagios:
+  status_file: status.dat

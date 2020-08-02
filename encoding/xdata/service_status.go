@@ -1,0 +1,58 @@
+package xdata
+
+// ServiceStatus represents a 'servicestatus' entry in the Nagios state.dat file.
+type ServiceStatus struct {
+	AcknowledgementType        AcknowledgementType
+	ActiveChecksEnabled        bool
+	CheckCommand               string
+	CheckExecutionTime         float32
+	CheckInterval              float32
+	CheckLatency               float32
+	CheckOptions               int
+	CheckPeriod                string
+	CheckType                  CheckType
+	CurrentAttempt             int
+	CurrentEventID             int
+	CurrentNotificationID      int
+	CurrentNotificationNumber  int
+	CurrentProblemID           int
+	CurrentState               ServiceState
+	EventHandlerEnabled        bool
+	EventHandler               string
+	FlapDetectionEnabled       bool
+	HasBeenChecked             bool
+	HostName                   string
+	IsFlapping                 bool
+	LastCheck                  int
+	LastEventID                int
+	LastHardStateChange        int
+	LastHardState              ServiceState
+	LastNotification           int
+	LastProblemID              int
+	LastStateChange            int
+	LastTimeCritical           int
+	LastTimeOK                 int
+	LastTimeUnknown            int
+	LastTimeWarning            int
+	LastUpdate                 int
+	LongPluginOutput           string
+	MaxAttempts                int
+	ModifiedAttributes         ModifiedAttribute
+	NextCheck                  int
+	NextNotification           int
+	NoMoreNotifications        bool
+	NotificationPeriod         string
+	NotificationsEnabled       bool
+	Obsess                     bool
+	PassiveChecksEnabled       bool
+	PercentStateChange         float32
+	PerformanceData            string
+	PluginOutput               string
+	ProblemHasBeenAcknowledged bool
+	ProcessPerformanceData     bool
+	RetryInterval              float32
+	ScheduledDowntimeDepth     int
+	ServiceDescription         string
+	ShouldBeScheduled          bool
+	StateType                  StateType
+}
