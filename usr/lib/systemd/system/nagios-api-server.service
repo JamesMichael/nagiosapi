@@ -1,0 +1,11 @@
+[Unit]
+Description = Nagios HTTP API
+After = network.target
+
+[Service]
+ExecStart = /usr/libexec/nagios-api-server server
+User = nagios
+Group = nagios
+
+[Install]
+WantedBy = multi-user.target
