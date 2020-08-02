@@ -33,7 +33,7 @@ func init() {
 
 func initConfig() {
 	if cfgFile != "" {
-		viper.SetConfigType(cfgFile)
+		viper.SetConfigFile(cfgFile)
 	} else {
 		viper.SetConfigName("nagios-api")
 		viper.SetConfigType("yaml")
