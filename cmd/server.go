@@ -8,6 +8,7 @@ import (
 	"github.com/jamesmichael/nagiosapi/nagios/cmd"
 	"github.com/jamesmichael/nagiosapi/nagios/statusdata"
 	"github.com/jamesmichael/nagiosapi/server"
+	"github.com/jamesmichael/nagiosapi/service/submission"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
@@ -59,7 +60,7 @@ func serverCmdFunc(cmd *cobra.Command, args []string) {
 
 func mustBuildCommandsHandler(l *zap.Logger) *server.CommandsHandler {
 	commandsFile := viper.GetString("nagios.external_commands_file")
-	ecf, err := cmd.NewWriter(
+	commandWriter, err := cmd.NewWriter(
 		cmd.WithFilename(commandsFile),
 		cmd.WithLogger(l),
 		cmd.WithNonBlocking(true),
@@ -71,9 +72,18 @@ func mustBuildCommandsHandler(l *zap.Logger) *server.CommandsHandler {
 		)
 	}
 
-	go ecf.Run()
+	go commandWriter.Run()
 
-	h, err := server.NewCommandsHandler(ecf)
+	svc, err := submission.NewService(
+		submission.WithExternalCommandsWriter(commandWriter),
+	)
+	if err != nil {
+		l.Fatal("unable to create submission service",
+			zap.Error(err),
+		)
+	}
+
+	h, err := server.NewCommandsHandler(svc)
 	if err != nil {
 		l.Fatal("unable to create commands handler",
 			zap.Error(err),
