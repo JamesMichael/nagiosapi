@@ -36,18 +36,23 @@ func NewService(opts ...ServiceOption) (*Service, error) {
 //
 // If the ServiceResult does not have a time set, the current unix timestamp
 // is used instead.
-func (s *Service) SubmitPassiveResult(r *ServiceResult) error {
-	t := r.Time
-	if t == 0 {
-		t = time.Now().Unix()
+func (s *Service) SubmitResult(
+	checkTime int64,
+	statusCode uint,
+	hostname string,
+	serviceName string,
+	body string,
+) error {
+	if checkTime == 0 {
+		checkTime = time.Now().Unix()
 	}
 
 	command := fmt.Sprintf("[%d] PROCESS_SERVICE_CHECK_RESULT;%s;%s;%d;%s",
-		t,
-		cmd.Sanitize(r.Hostname),
-		cmd.Sanitize(r.ServiceName),
-		r.Status,
-		cmd.Sanitize(r.Body),
+		checkTime,
+		cmd.Sanitize(hostname),
+		cmd.Sanitize(serviceName),
+		statusCode,
+		cmd.Sanitize(body),
 	)
 	if _, err := s.externalCommandsFile.Write([]byte(command)); err != nil {
 		return err

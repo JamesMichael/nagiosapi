@@ -12,10 +12,11 @@ import (
 
 // Server provides the main HTTP API.
 type Server struct {
-	addr            string
-	log             *zap.Logger
-	statusHandler   *StatusHandler
-	commandsHandler *CommandsHandler
+	addr          string
+	log           *zap.Logger
+	passiveCmdSvc PassiveCommandService
+	statusSvc     StatusService
+	mux           chi.Router
 }
 
 type ServerOpt func(s *Server) error
@@ -24,6 +25,7 @@ func NewServer(opts ...ServerOpt) (*Server, error) {
 	s := &Server{
 		addr: viper.GetString("api.addr"),
 		log:  zap.NewNop(),
+		mux:  chi.NewRouter(),
 	}
 
 	for _, opt := range opts {
@@ -43,25 +45,10 @@ func WithAddr(addr string) ServerOpt {
 	}
 }
 
-func WithCommandsHandler(h *CommandsHandler) ServerOpt {
-	return func(s *Server) error {
-		s.commandsHandler = h
-		return nil
-	}
-}
-
 // WithLog can be used to pass in a Logger.
 func WithLog(l *zap.Logger) ServerOpt {
 	return func(s *Server) error {
 		s.log = l
-		return nil
-	}
-}
-
-// WithStatusHandler can be used to set the handler for /api/status.
-func WithStatusHandler(sh *StatusHandler) ServerOpt {
-	return func(s *Server) error {
-		s.statusHandler = sh
 		return nil
 	}
 }
@@ -86,15 +73,7 @@ func (s *Server) ServeHTTP() {
 	)
 
 	router.Route("/v1", func(r chi.Router) {
-		r.Route("/api", func(r chi.Router) {
-			r.Route("/status", func(r chi.Router) {
-				r.Get("/{host}/{service}", s.statusHandler.GetServiceStatus)
-				r.Post("/", s.statusHandler.GetServiceStatusMulti)
-			})
-			r.Route("/submit", func(r chi.Router) {
-				r.Post("/", s.commandsHandler.SubmitResult)
-			})
-		})
+		r.Mount("/api", s.mux)
 	})
 
 	s.log.Info("starting HTTP API",

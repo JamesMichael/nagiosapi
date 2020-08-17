@@ -48,17 +48,20 @@ func serverCmdFunc(cmd *cobra.Command, args []string) {
 
 	server := mustBuildAPIServer(
 		log,
-		mustBuildCommandsHandler(log),
-		mustBuildStatusHandler(
-			log,
-			mustBuildStatusRepo(log),
-		),
+	)
+
+	server.RegisterPassiveCommandService(
+		mustBuildCommandService(log),
+	)
+
+	server.RegisterStatusService(
+		mustBuildStatusRepo(log),
 	)
 
 	server.ServeHTTP()
 }
 
-func mustBuildCommandsHandler(l *zap.Logger) *server.CommandsHandler {
+func mustBuildCommandService(l *zap.Logger) *submission.Service {
 	commandsFile := viper.GetString("nagios.external_commands_file")
 	commandWriter, err := cmd.NewWriter(
 		cmd.WithFilename(commandsFile),
@@ -82,14 +85,7 @@ func mustBuildCommandsHandler(l *zap.Logger) *server.CommandsHandler {
 			zap.Error(err),
 		)
 	}
-
-	h, err := server.NewCommandsHandler(svc)
-	if err != nil {
-		l.Fatal("unable to create commands handler",
-			zap.Error(err),
-		)
-	}
-	return h
+	return svc
 }
 
 func mustBuildLog() *zap.Logger {
@@ -130,24 +126,11 @@ func mustBuildStatusRepo(l *zap.Logger) *statusdata.Repository {
 	return r
 }
 
-func mustBuildStatusHandler(l *zap.Logger, r *statusdata.Repository) *server.StatusHandler {
-	h, err := server.NewStatusHandler(r)
-	if err != nil {
-		l.Fatal("unable to create status handler",
-			zap.Error(err),
-		)
-	}
-
-	return h
-}
-
-func mustBuildAPIServer(l *zap.Logger, ch *server.CommandsHandler, sh *server.StatusHandler) *server.Server {
+func mustBuildAPIServer(l *zap.Logger) *server.Server {
 	addr := viper.GetString("api.addr")
 	s, err := server.NewServer(
 		server.WithAddr(addr),
-		server.WithCommandsHandler(ch),
 		server.WithLog(l),
-		server.WithStatusHandler(sh),
 	)
 	if err != nil {
 		l.Fatal("unable to start server",
