@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/jamesmichael/nagiosapi/nagios/cmd"
 	"github.com/jamesmichael/nagiosapi/nagios/statusdata"
 	"github.com/jamesmichael/nagiosapi/server"
 	"github.com/spf13/cobra"
@@ -33,6 +34,11 @@ func init() {
 	viper.SetDefault("nagios.status_file", "/var/log/nagios/status.dat")
 	viper.BindPFlag("nagios.status_file", serverCmd.Flags().Lookup("nagios.status-file"))
 
+	var externalCommandsFile string
+	serverCmd.Flags().StringVar(&externalCommandsFile, "nagios.external-commands-file", "", "path to nagios commands file")
+	viper.SetDefault("nagios.external_commands_file", "/usr/local/nagios/var/rw/nagios.cmd")
+	viper.BindPFlag("nagios.external_commands_file", serverCmd.Flags().Lookup("nagios.external-commands-file"))
+
 	viper.SetDefault("app.production", true)
 }
 
@@ -41,6 +47,7 @@ func serverCmdFunc(cmd *cobra.Command, args []string) {
 
 	server := mustBuildAPIServer(
 		log,
+		mustBuildCommandsHandler(log),
 		mustBuildStatusHandler(
 			log,
 			mustBuildStatusRepo(log),
@@ -48,6 +55,31 @@ func serverCmdFunc(cmd *cobra.Command, args []string) {
 	)
 
 	server.ServeHTTP()
+}
+
+func mustBuildCommandsHandler(l *zap.Logger) *server.CommandsHandler {
+	commandsFile := viper.GetString("nagios.external_commands_file")
+	ecf, err := cmd.NewWriter(
+		cmd.WithFilename(commandsFile),
+		cmd.WithLogger(l),
+		cmd.WithNonBlocking(true),
+	)
+	if err != nil {
+		l.Fatal("unable to open new external commands writer",
+			zap.String("filename", commandsFile),
+			zap.Error(err),
+		)
+	}
+
+	go ecf.Run()
+
+	h, err := server.NewCommandsHandler(ecf)
+	if err != nil {
+		l.Fatal("unable to create commands handler",
+			zap.Error(err),
+		)
+	}
+	return h
 }
 
 func mustBuildLog() *zap.Logger {
@@ -99,12 +131,13 @@ func mustBuildStatusHandler(l *zap.Logger, r *statusdata.Repository) *server.Sta
 	return h
 }
 
-func mustBuildAPIServer(l *zap.Logger, h *server.StatusHandler) *server.Server {
+func mustBuildAPIServer(l *zap.Logger, ch *server.CommandsHandler, sh *server.StatusHandler) *server.Server {
 	addr := viper.GetString("api.addr")
 	s, err := server.NewServer(
 		server.WithAddr(addr),
+		server.WithCommandsHandler(ch),
 		server.WithLog(l),
-		server.WithStatusHandler(h),
+		server.WithStatusHandler(sh),
 	)
 	if err != nil {
 		l.Fatal("unable to start server",

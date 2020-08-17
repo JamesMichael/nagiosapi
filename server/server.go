@@ -12,9 +12,10 @@ import (
 
 // Server provides the main HTTP API.
 type Server struct {
-	addr          string
-	log           *zap.Logger
-	statusHandler *StatusHandler
+	addr            string
+	log             *zap.Logger
+	statusHandler   *StatusHandler
+	commandsHandler *CommandsHandler
 }
 
 type ServerOpt func(s *Server) error
@@ -38,6 +39,13 @@ func NewServer(opts ...ServerOpt) (*Server, error) {
 func WithAddr(addr string) ServerOpt {
 	return func(s *Server) error {
 		s.addr = addr
+		return nil
+	}
+}
+
+func WithCommandsHandler(h *CommandsHandler) ServerOpt {
+	return func(s *Server) error {
+		s.commandsHandler = h
 		return nil
 	}
 }
@@ -82,6 +90,9 @@ func (s *Server) ServeHTTP() {
 			r.Route("/status", func(r chi.Router) {
 				r.Get("/{host}/{service}", s.statusHandler.GetServiceStatus)
 				r.Post("/", s.statusHandler.GetServiceStatusMulti)
+			})
+			r.Route("/submit", func(r chi.Router) {
+				r.Post("/", s.commandsHandler.SubmitResult)
 			})
 		})
 	})
