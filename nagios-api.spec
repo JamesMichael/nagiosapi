@@ -2,7 +2,7 @@
 %define debug_package %{nil}
 
 Name:         nagios-api
-Version:      0.1.1
+Version:      0.2.0
 Release:      1%{?dist}
 Summary:      Nagios API Server
 URL:          https://github.com/JamesMichael/nagiosapi
@@ -65,6 +65,9 @@ cp -a usr/lib/systemd/system/* %{buildroot}%{_unitdir}
 %systemd_postun_with_restart nagios-api-server.service
 
 %changelog
+* Mon Aug 17 2020 James Michael <jamesamichael@gmail.com> - 0.2.0-1
+- Add support for submitting passive check results
+
 * Sun Aug 2 2020 James Michael <jamesamichael@gmail.com> - 0.1.1-1
 - Fix miscellaneous bugs
 
